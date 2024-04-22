@@ -9,14 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// SettingsNodeInfoUpdateView 修改Node配置项信息
 func (SettingsApi) SettingsNodeInfoUpdateView(c *gin.Context) {
 	var cr config.Node
+	//绑定输出
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
 		res.FailWithCode(res.ArgumentError, c)
 		return
 	}
-	//res.OkWithData(global.Config.SiteInfo, c)
+
 	global.Config.Node = cr
 	err = core.SetYaml()
 	if err != nil {

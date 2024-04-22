@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserRemoveView 删除用户
 func (UserApi) UserRemoveView(c *gin.Context) {
 	var cr models.RemoveRequest
 	err := c.ShouldBindJSON(&cr)
@@ -20,7 +21,7 @@ func (UserApi) UserRemoveView(c *gin.Context) {
 	var userList []models.UserModel
 	count := global.DB.Find(&userList, cr.IDList).RowsAffected
 	if count == 0 {
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
 
@@ -36,7 +37,7 @@ func (UserApi) UserRemoveView(c *gin.Context) {
 	})
 	if err != nil {
 		global.Log.Error(err)
-		res.FailWithMessage("删除用户失败", c)
+		res.FailWithMessage("delete fail", c)
 		return
 	}
 	res.OkWithMessage(fmt.Sprintf("共删除 %d 个用户", count), c)

@@ -8,25 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	func (SettingsApi) SettingsSiteInfoUpdateView(c *gin.Context) {
-//		var cr config.SiteInfo
-//		err := c.ShouldBindJSON(&cr)
-//		if err != nil {
-//			res.FailWithCode(res.ArgumentError, c)
-//			return
-//		}
-//		//res.OkWithData(global.Config.SiteInfo, c)
-//		fmt.Println("before", global.Config)
-//		global.Config.SiteInfo = cr
-//		fmt.Println("after", global.Config)
-//		err = core.SetYaml()
-//		if err != nil {
-//			global.Log.Error(err)
-//			res.FailWithMessage(err.Error(), c)
-//			return
-//		}
-//		res.OkWith(c)
-//	}
+// SettingsInfoUpdateView 配置信息动态路由
 func (SettingsApi) SettingsInfoUpdateView(c *gin.Context) {
 	var cr SettingsUri
 	err := c.ShouldBindUri(&cr)
@@ -34,15 +16,16 @@ func (SettingsApi) SettingsInfoUpdateView(c *gin.Context) {
 		res.FailWithCode(res.ArgumentError, c)
 		return
 	}
+	//查看对应配置信息
 	switch cr.Name {
-	case "email":
-		var info config.Email
+	case "site_info":
+		var info config.SiteInfo
 		err = c.ShouldBindJSON(&info)
 		if err != nil {
 			res.FailWithCode(res.ArgumentError, c)
 			return
 		}
-		global.Config.Email = info
+		global.Config.SiteInfo = info
 	case "system":
 		var info config.System
 		err = c.ShouldBindJSON(&info)
@@ -80,6 +63,9 @@ func (SettingsApi) SettingsInfoUpdateView(c *gin.Context) {
 		return
 	}
 
-	core.SetYaml()
+	err = core.SetYaml()
+	if err != nil {
+		return
+	}
 	res.OkWith(c)
 }

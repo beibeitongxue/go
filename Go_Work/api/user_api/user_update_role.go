@@ -9,33 +9,34 @@ import (
 )
 
 type UserRole struct {
-	Role     ctype.Role `json:"role" binding:"required,oneof=1 2 3 4" msg:"权限参数错误"`
+	Role     ctype.Role `json:"role" binding:"required, one of=1 2 3 4" msg:"权限参数错误"`
 	NiceName string     `json:"nice_name" binding:"required"  ` //防止非法昵称
 	UserName string     `json:"user_name" binding:"required" msg:"用户名错误" `
 }
 
-// 用户权限变更
+// UserUpdateRole 用户权限变更
 func (UserApi) UserUpdateRole(c *gin.Context) {
 	var cr UserRole
 	if err := c.ShouldBindJSON(&cr); err != nil {
 		res.FailWithCode(res.ArgumentError, c)
 		return
 	}
+	//验证用户信息
 	var user models.UserModel
 	err := global.DB.Take(&user, "user_name = ?", cr.UserName).Error
 	if err != nil {
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
-
+	//修改权限或昵称
 	err = global.DB.Model(&user).Updates(map[string]any{
 		"role":      cr.Role,
 		"nick_name": cr.NiceName,
 	}).Error
 	if err != nil {
 		global.Log.Error(err)
-		res.FailWithMessage("修改权限失败", c)
+		res.FailWithCode(res.UpdateFailed, c)
 		return
 	}
-	res.OkWithMessage("修改权限成功", c)
+	res.OkWithMessage("Update Success", c)
 }

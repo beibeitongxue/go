@@ -16,6 +16,7 @@ func CreateUser(permissions string) {
 		password   string
 		rePassword string
 		email      string
+		device     string
 	)
 	fmt.Printf("请输入用户名：")
 	fmt.Scan(&userName)
@@ -27,7 +28,8 @@ func CreateUser(permissions string) {
 	fmt.Scan(&password)
 	fmt.Printf("请再次输入密码：")
 	fmt.Scan(&rePassword)
-
+	fmt.Printf("请再次输入密码：")
+	fmt.Scan(&device)
 	//校验两次密码
 	if password != rePassword {
 		global.Log.Error("两次密码不一致，请重新输入")
@@ -40,7 +42,7 @@ func CreateUser(permissions string) {
 	if permissions == "admin" {
 		role = ctype.PermissionAdmin
 	}
-	err := user_ser.UserService{}.CreateUser(userName, nickName, password, role, email, "127.0.0.1")
+	err := user_ser.UserService{}.CreateUser(userName, nickName, password, role, email, device)
 	if err != nil {
 		global.Log.Error(err)
 		return

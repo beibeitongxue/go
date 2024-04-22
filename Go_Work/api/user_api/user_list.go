@@ -20,6 +20,7 @@ type UserListRequest struct {
 	Role int `json:"role" form:"role"`
 }
 
+// UserListView 用户信息列表
 func (UserApi) UserListView(c *gin.Context) {
 	_claims, _ := c.Get("claims")
 	claims := _claims.(*jwts.CustomClaims)
@@ -29,6 +30,7 @@ func (UserApi) UserListView(c *gin.Context) {
 		res.FailWithCode(res.ArgumentError, c)
 		return
 	}
+	//获取用户信息列表
 	var users []UserResponse
 	list, count, _ := common.ComList(models.UserModel{Role: ctype.Role(page.Role)}, common.Option{
 		PageInfo: page.PageInfo,

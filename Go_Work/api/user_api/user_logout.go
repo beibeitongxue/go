@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
+// LogoutView 注销
 func (UserApi) LogoutView(c *gin.Context) {
 	_claims, _ := c.Get("claims")
 	claims := _claims.(*jwts.CustomClaims)
 	token := c.Request.Header.Get("token")
-	//err := service.ServiceApp.UserService.Logout(claims, token)
 	exp := claims.ExpiresAt
 	now := time.Now()
 	diff := exp.Time.Sub(now)
@@ -21,9 +21,9 @@ func (UserApi) LogoutView(c *gin.Context) {
 	err := global.Redis.Set(fmt.Sprintf("logout_%s", token), "", diff).Err()
 	if err != nil {
 		global.Log.Error(err)
-		res.FailWithMessage("注销失败", c)
+		res.FailWithMessage("Logout fail", c)
 		return
 	}
-	res.OkWithMessage("注销成功", c)
+	res.OkWithMessage("Logout Success", c)
 
 }

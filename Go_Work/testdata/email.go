@@ -64,7 +64,7 @@ func sendMail(userName, authCode, host string, port int, mailTo, sendName string
 	return err
 }
 
-func main() {
+func main4() {
 	core.InitConf()
 	core.InitLogger()
 	NewCode().Send("3265912674@qq.com", "验证码是 2056")

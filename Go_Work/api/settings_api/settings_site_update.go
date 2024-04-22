@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// SettingsSiteUpdateView 修改网站信息
 func (SettingsApi) SettingsSiteUpdateView(c *gin.Context) {
 	var info config.SiteInfo
 	err := c.ShouldBindJSON(&info)

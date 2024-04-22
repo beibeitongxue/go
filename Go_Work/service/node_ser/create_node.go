@@ -3,17 +3,28 @@ package node_ser
 import (
 	"Go_Work/global"
 	"Go_Work/models"
-	"errors"
-	"fmt"
+	"Go_Work/models/res"
 )
 
-func (NodeService) CreateUser(Nodename string) error {
-	// 判断用户名是否存在
+func (NodeService) CreateNode(Nid, NodeName, Country, Bandwidth, Addr, Rate, Feature, Nodetype string) error {
+	// 判断节点是否存在
 	var nodeModel models.NodeModel
-	fmt.Println(Nodename)
-	err := global.DB.Take(&nodeModel, "node_name = ?", Nodename).Error
+	err := global.DB.Take(&nodeModel, "node_name = ?", NodeName).Error
 	if err == nil {
-		return errors.New("节点名已存在")
+		err := res.NodeExit
+		return err
 	}
-	return nil
+
+	err = global.DB.Create(&models.NodeModel{
+		NodeName:  Nid,
+		Country:   Country,
+		Bandwidth: Bandwidth,
+		//Bear:
+		Addr:    Addr,
+		Rate:    Rate,
+		Feature: Feature,
+		//Link:
+		Nodetype: Nodetype,
+	}).Error
+	return err
 }

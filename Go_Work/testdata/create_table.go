@@ -20,7 +20,7 @@ type LogStashModel struct {
 	UserID    uint      `json:"user_id"`                 // 登录用户的用户id，需要自己在查询的时候做关联查询
 }
 
-func main() {
+func main7() {
 	core.InitConf()
 	dsn := global.Config.Mysql.Dsn()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

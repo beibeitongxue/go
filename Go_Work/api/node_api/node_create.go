@@ -1,11 +1,9 @@
 package node_api
 
 import (
-	"Go_Work/core"
 	"Go_Work/global"
 	"Go_Work/models/res"
 	"Go_Work/service/node_ser"
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -24,50 +22,23 @@ type NodeCreateRequest struct {
 	Nodetype string `json:"nodetype" binding:"required" msg:"节点是否收费"` // 权限  1 管理员  2 普通用户  3 游客
 }
 
-//const (
-//	username = "root"
-//	password = "2864//"
-//	dbname   = "db"
-//)
-
+// NodeCreate 创建新节点至数据库
 func (NodeApi) NodeCreate(c *gin.Context) {
 	var request NodeCreateRequest
 
-	if err := c.ShouldBindJSON(&request); err != nil {
-		res.FailWithError(err, &request, c)
+	var cr NodeCreateRequest
+	if err := c.ShouldBindJSON(&cr); err != nil {
+		res.FailWithCode(res.ArgumentError, c)
 		return
 	}
-	//验证节点是否存在
-	err := node_ser.NodeService{}.CreateUser(request.NodeName)
-	if err != nil {
-		res.FailWithError(err, &request, c)
-		return
-	}
-	core.InitConf()
-	dsn := global.Config.Mysql.Dsn()
-	//dsn := username + ":" + password + "@tcp(localhost:3306)/" + dbname + "?parseTime=true"
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		res.FailWithError(err, &request, c)
-		return
-	}
-	defer db.Close()
 
-	// 准备 SQL 语句
-	stmt, err := db.Prepare("INSERT INTO node_models (nid, node_name, country, bandwidth, addr, rate, feature, nodetype) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+	err := node_ser.NodeService{}.CreateNode(cr.Nid, cr.NodeName, cr.Country, cr.Bandwidth, cr.Addr, cr.Rate, cr.Feature, cr.Nodetype)
 	if err != nil {
-		res.FailWithError(err, &request, c)
+		global.Log.Error(err)
+		res.FailWithCode(res.CreatedError, c)
 		return
 	}
-	defer stmt.Close()
-
-	// 执行插入操作
-	_, err = stmt.Exec(request.Nid, request.NodeName, request.Country, request.Bandwidth, request.Addr, request.Rate, request.Feature, request.Nodetype)
-	if err != nil {
-		res.FailWithError(err, &request, c)
-		return
-	}
-	res.OkWithMessage(fmt.Sprintf("节点%s创建成功!", request.NodeName), c)
+	res.OkWithMessage(fmt.Sprintf("Node Cteat Success!", request.NodeName), c)
 	return
 
 }

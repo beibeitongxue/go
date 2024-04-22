@@ -17,6 +17,7 @@ type UserUpdateNicknameRequest struct {
 	Link     string `json:"link" structs:"link"`
 }
 
+// UserUpdateNickName 修改登陆人昵称
 func (UserApi) UserUpdateNickName(c *gin.Context) {
 	var cr UserUpdateNicknameRequest
 	_claims, _ := c.Get("claims")
@@ -37,15 +38,15 @@ func (UserApi) UserUpdateNickName(c *gin.Context) {
 	var userModel models.UserModel
 	err = global.DB.Debug().Take(&userModel, claims.UserID).Error
 	if err != nil {
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
 	err = global.DB.Model(&userModel).Updates(newMaps).Error
 	if err != nil {
 		global.Log.Error(err)
-		res.FailWithMessage("修改用户信息失败", c)
+		res.FailWithCode(res.UpdateFailed, c)
 		return
 	}
-	res.OkWithMessage("修改个人信息成功", c)
+	res.OkWithMessage("Update Success", c)
 
 }

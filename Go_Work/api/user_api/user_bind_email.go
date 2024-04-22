@@ -4,32 +4,20 @@ import (
 	"Go_Work/global"
 	"Go_Work/models"
 	"Go_Work/models/res"
+	"Go_Work/service/user_ser"
 	"Go_Work/utils/jwts"
-	"errors"
 	"github.com/gin-gonic/gin"
 )
 
 type BindEmailRequest struct {
-	Email string `json:"email" binding:"required,email" msg:"邮箱非法"`
-	//Code     *string `json:"code"`
-	//Password string  `json:"password"`
+	Email string `json:"email" binding:"required,email" msg:"Mailbox illegal"`
 }
 
-func CheckEmail(Email string) error {
-	var userModel models.UserModel
-	err := global.DB.Take(&userModel, "email = ?", Email).Error
-	if err == nil {
-		return errors.New("邮箱已存在")
-	}
-	return nil
-}
+// UserBindEmailView 绑定邮箱
 func (UserApi) UserBindEmailView(c *gin.Context) {
-	//用户绑定邮箱，第一次输入是邮箱
-	//后台给这个邮箱发送验证码
 	_claims, _ := c.Get("claims")
 	claims := _claims.(*jwts.CustomClaims)
-	// 用户绑定邮箱， 第一次输入是 邮箱
-	// 后台会给这个邮箱发验证码
+
 	var cr BindEmailRequest
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
@@ -68,32 +56,24 @@ func (UserApi) UserBindEmailView(c *gin.Context) {
 	var user models.UserModel
 	err = global.DB.Take(&user, claims.UserID).Error
 	if err != nil {
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
-	err = CheckEmail(cr.Email)
-
+	err = user_ser.UserService{}.CheckEmail(cr.Email)
 	if err != nil {
 		res.FailWithError(err, &cr, c)
 		return
 	}
-	//if len(cr.Password) < 4 {
-	//	res.FailWithMessage("密码强度太低", c)
-	//	return
-	//}
-	//hashPwd := pwd.HashPwd(cr.Password)
-	// 第一次的邮箱，和第二次的邮箱也要做一致性校验
 
 	err = global.DB.Model(&user).Updates(map[string]any{
 		"email": cr.Email,
-		//"password": hashPwd,
 	}).Error
 	if err != nil {
 		global.Log.Error(err)
-		res.FailWithMessage("绑定邮箱失败", c)
+		res.FailWithCode(res.EmailBlindError, c)
 		return
 	}
 	// 完成绑定
-	res.OkWithMessage("邮箱绑定成功", c)
+	res.OkWithMessage("Email Blind Success", c)
 	return
 }

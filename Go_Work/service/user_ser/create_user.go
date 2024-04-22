@@ -5,17 +5,16 @@ import (
 	"Go_Work/models"
 	"Go_Work/models/ctype"
 	"Go_Work/utils/pwd"
-	"errors"
-	"fmt"
+	"github.com/ser163/WordBot/generate"
 )
 
-func (UserService) CreateUser(userName, nickName, password string, role ctype.Role, email string, ip string) error {
+func (UserService) CreateUser(userName, nickName, password string, role ctype.Role, email string, deviceId string) error {
 	// 判断用户名是否存在
 	var userModel models.UserModel
-	fmt.Println(userName)
-	err := global.DB.Take(&userModel, "user_name = ?", userName).Error
+	err := global.DB.Take(&userModel, "user_name=?", userName).Error
 	if err == nil {
-		return errors.New("用户名已存在")
+		w, _ := generate.GenRandomWorld(10, "none")
+		userName = w.Word
 	}
 	// 对密码进行hash
 	hashPwd := pwd.HashPwd(password)
@@ -27,7 +26,9 @@ func (UserService) CreateUser(userName, nickName, password string, role ctype.Ro
 		Password: hashPwd,
 		Email:    email,
 		Role:     role,
-		IP:       ip,
+		//IP:       ip,
+		DeviceID: deviceId,
+		Link:     userName,
 	}).Error
 	if err != nil {
 		return err

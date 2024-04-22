@@ -17,6 +17,7 @@ type EmailLoginRequest struct {
 	Password string `json:"password" binding:"required" msg:"请输入密码"`
 }
 
+// LoginView 登陆界面
 func (UserApi) LoginView(c *gin.Context) {
 	var cr EmailLoginRequest
 	err := c.ShouldBindJSON(&cr)
@@ -26,22 +27,21 @@ func (UserApi) LoginView(c *gin.Context) {
 	}
 
 	log := log_stash.NewLogByGin(c)
-
 	var userModel models.UserModel
 	err = global.DB.Take(&userModel, "user_name = ? or email = ?", cr.UserName, cr.UserName).Error
 	if err != nil {
-		// 没找到
-		global.Log.Warn("用户名不存在")
-		log.Warn(fmt.Sprintf("%s 用户名不存在", cr.UserName))
-		res.FailWithMessage("用户名或密码错误", c)
+		// 账号不存在
+		global.Log.Warn("UserName Not Exist")
+		log.Warn(fmt.Sprintf("%s UserName Not Exist", cr.UserName))
+		res.FailWithCode(res.UserNameError, c)
 		return
 	}
 	// 校验密码
 	isCheck := pwd.CheckPwd(userModel.Password, cr.Password)
 	if !isCheck {
-		global.Log.Warn("用户名密码错误")
-		log.Warn(fmt.Sprintf("用户名密码错误 %s %s", cr.UserName, cr.Password))
-		res.FailWithMessage("用户名或密码错误", c)
+		global.Log.Warn("Password Not Match")
+		log.Warn(fmt.Sprintf("Password Not Match %s %s", cr.UserName, cr.Password))
+		res.FailWithCode(res.UserNameError, c)
 		return
 	}
 	// 登录成功，生成token
@@ -53,8 +53,8 @@ func (UserApi) LoginView(c *gin.Context) {
 	})
 	if err != nil {
 		global.Log.Error(err)
-		log.Error(fmt.Sprintf("token生成失败 %s", err.Error()))
-		res.FailWithMessage("token生成失败", c)
+		log.Error(fmt.Sprintf("Token Build failure %s", err.Error()))
+		res.FailWithCode(res.TokenslideError, c)
 		return
 	}
 	ip, addr := utils.GetAddrByGin(c)

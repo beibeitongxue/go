@@ -9,6 +9,7 @@ import (
 	"github.com/liu-cn/json-filter/filter"
 )
 
+// UserInfoView 查看用户信息
 func (UserApi) UserInfoView(c *gin.Context) {
 
 	_claims, _ := c.Get("claims")
@@ -17,7 +18,7 @@ func (UserApi) UserInfoView(c *gin.Context) {
 	var userInfo models.UserModel
 	err := global.DB.Take(&userInfo, claims.UserID).Error
 	if err != nil {
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
 	res.OkWithData(filter.Select("info", userInfo), c)

@@ -14,8 +14,8 @@ type UpdatePasswordRequest struct {
 	Pwd    string `json:"pwd" binding:"required" msg:"请输入新密码"`
 }
 
-// 修改登陆人密码
-func (UserApi) UserUdatePassword(c *gin.Context) {
+// UserUpdatePassword 修改登陆人密码
+func (UserApi) UserUpdatePassword(c *gin.Context) {
 	_claims, _ := c.Get("claims")
 	claims := _claims.(*jwts.CustomClaims)
 	var cr UpdatePasswordRequest
@@ -26,21 +26,21 @@ func (UserApi) UserUdatePassword(c *gin.Context) {
 	var user models.UserModel
 	err := global.DB.Take(&user, claims.UserID).Error
 	if err != nil {
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
-	//判断密码是否一直
+	//判断密码是否一致
 	if !pwd.CheckPwd(user.Password, cr.OldPwd) {
-		res.FailWithMessage("原密码错误", c)
+		res.FailWithCode(res.PasswordError, c)
 		return
 	}
 	Hashpwd := pwd.HashPwd(cr.Pwd)
 	err = global.DB.Model(&user).Update("password", Hashpwd).Error
 	if err != nil {
 		global.Log.Error(err)
-		res.FailWithMessage("用户不存在", c)
+		res.FailWithCode(res.UserNotExit, c)
 		return
 	}
-	res.OkWithMessage("密码修改成功", c)
+	res.OkWithMessage("Update Success", c)
 	return
 }
