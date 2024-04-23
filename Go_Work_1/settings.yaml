@@ -1,0 +1,56 @@
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  config: ""
+  db: db
+  user: root
+  password: Root1234//
+  log_level: dev
+  parse_time: "true"
+logger:
+  level: info
+  prefix: '[gvb]'
+  director: log
+  show_line: true
+  log_in_console: true
+system:
+  host: 0.0.0.0
+  port: 8080
+  env: release
+site_info:
+  web_side: https://github.com/
+  email: 2862946703@qq.com
+  telegram: "12897"
+  version: 1.0.5
+  platform: windows
+  newest: 1.1.2
+  desc: 最好的vpn
+  minimum: 1.0.4
+email:
+  host: smtp.qq.com
+  port: 465
+  user: 2862946703@qq.com
+  password: "1234"
+  default_from_email: 枫枫知道
+  use_ssl: true
+  user_tls: false
+jwy:
+  secret: xxxx
+  expires: 20
+  issuer: "1234"
+node:
+  nid: "2"
+  node_name: 澳门
+  country: 中国
+  bandwidth: 120M
+  tel: "17671054954"
+  addr: ribrn
+  token: ""
+  ip: 127.0.0.1
+  link: http://127.0.0.1:8080/api/settings
+  node_type: "0"
+redis:
+  ip: 127.0.0.1
+  port: 6379
+  password: 12345
+  pool_size: 100
